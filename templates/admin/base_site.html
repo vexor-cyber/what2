@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block title %}Крок · адмінпанель{% endblock %}
+{% block branding %}<h1 id="site-name"><a href="{% url 'admin:index' %}">Крок <span>· керування бібліотекою</span></a></h1>{% endblock %}
+{% block extrahead %}
+	{{ block.super }}
+	<link rel="stylesheet" href="{% static 'library/admin.css' %}">
+	<style>
+		html, html[data-theme] {
+			{% if site_preferences.admin_theme == 'dark' %}
+			color-scheme: dark;
+			--body-bg: #151a17;
+			--body-fg: #f0f4ee;
+			--body-quiet-color: #c4cec5;
+			--body-loud-color: #ffffff;
+			--header-bg: #101511;
+			--header-color: #f4f6f1;
+			--breadcrumbs-bg: #202922;
+			--breadcrumbs-fg: #d4ddd4;
+			--breadcrumbs-link-fg: #d9ef72;
+			--link-fg: #c6e77a;
+			--link-hover-color: #e2f6a0;
+			--link-selected-fg: #c6e77a;
+			--hairline-color: #465249;
+			--border-color: #465249;
+			--darkened-bg: #202922;
+			--selected-bg: #28352c;
+			--selected-row: #28352c;
+			--button-bg: #416751;
+			--button-hover-bg: #537f63;
+			--default-button-bg: #416751;
+			--default-button-hover-bg: #537f63;
+			--object-tools-bg: #416751;
+			--object-tools-hover-bg: #537f63;
+			--object-tools-fg: #ffffff;
+			--error-fg: #ff9c8c;
+			{% else %}
+			color-scheme: light;
+			--body-bg: #f2f4ee;
+			--body-fg: #1e2923;
+			--body-quiet-color: #536057;
+			--body-loud-color: #17221b;
+			--header-bg: #1e2923;
+			--header-color: #fbfcf8;
+			--breadcrumbs-bg: #e2e8df;
+			--breadcrumbs-fg: #344238;
+			--breadcrumbs-link-fg: #294d38;
+			--link-fg: #345d48;
+			--link-hover-color: #1f4931;
+			--link-selected-fg: #294d38;
+			--hairline-color: #cbd4ca;
+			--border-color: #cbd4ca;
+			--darkened-bg: #e7ece4;
+			--selected-bg: #e1ead9;
+			--selected-row: #e1ead9;
+			--button-bg: #345d48;
+			--button-hover-bg: #294d38;
+			--default-button-bg: #345d48;
+			--default-button-hover-bg: #294d38;
+			--object-tools-bg: #345d48;
+			--object-tools-hover-bg: #294d38;
+			--object-tools-fg: #ffffff;
+			--error-fg: #a93425;
+			{% endif %}
+		}
+	</style>
+{% endblock %}

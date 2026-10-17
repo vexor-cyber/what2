@@ -1,0 +1,35 @@
+{% extends 'library/base.html' %}
+{% block title %}Бібліотека зошитів — {{ site_preferences.site_name }}{% endblock %}
+{% block content %}
+<div class="library-layout">
+    <aside class="library-rail">
+        <p class="rail-label">НАВЧАННЯ</p>
+        <a class="rail-item is-selected" href="{% url 'catalog' %}"><span class="rail-icon">▤</span>Усі зошити</a>
+        <div class="rail-separator"></div>
+        <p class="rail-label">ОБЕРИ КЛАС</p>
+        <a class="grade-item {% if grade == '8' %}is-grade-active{% endif %}" href="?grade=8"><span>08</span><span>8 клас</span>{% if grade == '8' %}<b>●</b>{% endif %}</a>
+        <a class="grade-item {% if grade == '9' %}is-grade-active{% endif %}" href="?grade=9"><span>09</span><span>9 клас</span>{% if grade == '9' %}<b>●</b>{% endif %}</a>
+        <div class="rail-bottom"><span class="rail-spark">✳</span><p>Вчися у своєму темпі.<br>Розбирайся, а не зубри.</p></div>
+    </aside>
+    <section class="library-main">
+        <div class="library-heading">
+            <div><p class="overline"><span class="live-dot"></span>НАВЧАЛЬНА БІБЛІОТЕКА</p><h1>Знайди свій<br><em>наступний крок.</em></h1></div>
+            <div class="heading-aside"><span class="heading-mark">✳</span><p>Зошити, вправи<br>та зрозумілі пояснення.</p></div>
+        </div>
+        <form class="filter-bar" method="get" action="{% url 'catalog' %}">
+            <label class="search-field"><span aria-hidden="true">⌕</span><input type="search" name="q" value="{{ search }}" placeholder="Зошит або предмет"></label>
+            <label class="select-field"><span class="filter-caption">КЛАС</span><select name="grade"><option value="">Усі класи</option><option value="8" {% if grade == '8' %}selected{% endif %}>8 клас</option><option value="9" {% if grade == '9' %}selected{% endif %}>9 клас</option></select></label>
+            <label class="select-field"><span class="filter-caption">ПРЕДМЕТ</span><select name="subject"><option value="">Усі предмети</option>{% for name in subjects %}<option value="{{ name }}" {% if subject == name %}selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
+            <button class="filter-submit" type="submit" aria-label="Застосувати фільтри">→</button>
+        </form>
+        <div class="results-heading"><div><span class="overline">КАТАЛОГ</span><h2>{% if grade %}Матеріали для {{ grade }} класу{% else %}Усі матеріали{% endif %}</h2></div><span class="result-count">{{ books|length }} ЗОШИТІВ</span></div>
+        {% if books %}<div class="book-grid">
+            {% for book in books %}<a class="book-card book-tone-{{ forloop.counter|divisibleby:4|yesno:'four,one' }}" href="{% url 'workbook_detail' book.id %}">
+                <div class="book-cover {% cycle 'cover-mint' 'cover-blue' 'cover-coral' 'cover-yellow' %}">{% if book.cover_image %}<img src="{% url 'workbook_cover' book.id %}" alt="Обкладинка: {{ book.title }}">{% elif book.cover_url %}<img src="{{ book.cover_url }}" alt="Обкладинка: {{ book.title }}">{% else %}<span class="cover-label">РОБОЧИЙ ЗОШИТ</span><span class="cover-grade">{{ book.grade }}<small>КЛАС</small></span><span class="cover-subject">{{ book.subject }}</span><span class="cover-abstract">✳</span>{% endif %}<span class="cover-edition">{{ book.edition|default:'НАВЧАЛЬНА СЕРІЯ' }}</span></div>
+                <div class="book-meta"><div><span class="book-subject">{{ book.subject }} · {{ book.grade }} КЛАС</span><h3>{{ book.title }}</h3><p>{% if book.publisher %}{{ book.publisher }}{% else %}Навчальний зошит{% endif %}</p></div><span class="book-arrow" aria-hidden="true">↗</span></div>
+            </a>{% endfor %}
+        </div>{% else %}<div class="library-empty"><div class="empty-art"><span class="empty-sun">✳</span><span class="empty-page empty-page-back"></span><span class="empty-page empty-page-front"><i></i><i></i><i></i></span></div><div><p class="overline">БІБЛІОТЕКА ПОПОВНЮЄТЬСЯ</p><h2>{% if search or grade or subject %}За цими фільтрами зошитів поки немає.{% else %}Почнемо з першого зошита?{% endif %}</h2><p>Матеріали для 8 та 9 класів з’являться тут, коли їх додадуть до бібліотеки.</p>{% if user.is_staff %}<a class="text-link" href="{% url 'admin:library_studybook_add' %}">Додати зошит в адмінпанелі ↗</a>{% endif %}</div></div>{% endif %}
+        {% if not user.is_authenticated %}<div class="access-strip"><span class="access-symbol">↗</span><div><b>Зберігай свій прогрес</b><span>Створи акаунт, щоб повертатися до потрібних пояснень.</span></div><a href="{% url 'register' %}">Зареєструватися</a></div>{% elif not user.is_staff %}<div class="access-strip"><span class="access-symbol">◷</span><div><b>{% if user.subscription.is_active %}Доступ активний{% else %}Потрібна підписка{% endif %}</b><span>{% if user.subscription.is_active %}Можеш відкривати пояснення до вправ.{% else %}Каталог доступний, а пояснення відкриються після активації підписки.{% endif %}</span></div><a href="{% url 'subscription' %}">{% if user.subscription.is_active %}Деталі доступу{% else %}Перевірити доступ{% endif %} ↗</a></div>{% endif %}
+    </section>
+</div>
+{% endblock %}

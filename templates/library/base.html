@@ -1,0 +1,49 @@
+{% load static %}
+<!doctype html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f2f4ee">
+    <title>{% block title %}{{ site_preferences.site_name }}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'library/site.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header class="topbar">
+        <a href="{% url 'home' %}" class="wordmark" aria-label="Крок, на головну"><span class="wordmark-icon">к</span><span>{{ site_preferences.site_name }}</span></a>
+        <nav class="top-nav" aria-label="Основна навігація">
+            <a href="{% url 'catalog' %}" class="{% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'catalog' %}is-current{% endif %}">Бібліотека</a>
+            <a href="{% url 'settings' %}">Налаштування</a>
+            {% if user.is_staff %}<a href="{% url 'admin:index' %}">Адмінпанель</a>{% endif %}
+        </nav>
+        <div class="top-actions">
+            <button class="theme-button" type="button" id="theme-toggle" title="Змінити тему" aria-label="Змінити тему">◐</button>
+            {% if user.is_authenticated %}
+                <a class="avatar-link" href="{% url 'settings' %}" title="{{ user.username }}">{{ user.username|first|upper }}</a>
+                <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="quiet-button" type="submit">Вийти</button></form>
+            {% else %}
+                <a class="quiet-button" href="{% url 'login' %}">Увійти</a>
+                <a class="dark-button top-register" href="{% url 'register' %}">Створити акаунт <span aria-hidden="true">↗</span></a>
+            {% endif %}
+        </div>
+    </header>
+    {% if site_preferences.announcement %}<div class="announcement"><span class="announcement-dot"></span>{{ site_preferences.announcement }}</div>{% endif %}
+    {% if messages %}<div class="messages" aria-live="polite">{% for message in messages %}<p class="message {{ message.tags }}">{{ message }}</p>{% endfor %}</div>{% endif %}
+    <main>{% block content %}{% endblock %}</main>
+    <footer class="footer"><a class="wordmark" href="{% url 'home' %}"><span class="wordmark-icon">к</span><span>{{ site_preferences.site_name }}</span></a><span>Навчання, яке складається з маленьких кроків.</span><a href="{% url 'subscription' %}">Доступ і підписка</a></footer>
+    <script>
+        const themeToggle = document.querySelector('#theme-toggle');
+        document.documentElement.dataset.theme = localStorage.getItem('krok-theme') || 'light';
+        themeToggle.addEventListener('click', () => {
+            const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.dataset.theme = theme;
+            localStorage.setItem('krok-theme', theme);
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

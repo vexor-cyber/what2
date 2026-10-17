@@ -1,0 +1,10 @@
+{% extends "admin/change_list.html" %}
+{% block object-tools-items %}
+    <li>
+        <form method="post" action="{% url 'admin:library_subscription_grant_self' %}">
+            {% csrf_token %}
+            <button class="button" type="submit">Відкрити мені доступ на місяць</button>
+        </form>
+    </li>
+    {{ block.super }}
+{% endblock %}

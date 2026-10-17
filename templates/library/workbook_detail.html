@@ -1,0 +1,14 @@
+{% extends 'library/base.html' %}
+{% block title %}{{ workbook.title }} — {{ site_preferences.site_name }}{% endblock %}
+{% block content %}
+<section class="workbook-page">
+    <a class="back-link" href="{% url 'catalog' %}">← До бібліотеки</a>
+    <div class="workbook-heading"><div><p class="overline">{{ workbook.subject|upper }} · {{ workbook.grade }} КЛАС</p><h1>{{ workbook.title }}</h1><p class="workbook-description">{{ workbook.description|default:'Матеріали цього зошита та пояснення до вправ.' }}</p><p class="workbook-edition">{% if workbook.publisher %}{{ workbook.publisher }}{% endif %}{% if workbook.edition %} · {{ workbook.edition }}{% endif %}</p></div>{% if workbook.cover_image %}<img class="workbook-cover" src="{% url 'workbook_cover' workbook.id %}" alt="Обкладинка: {{ workbook.title }}">{% elif workbook.cover_url %}<img class="workbook-cover" src="{{ workbook.cover_url }}" alt="Обкладинка: {{ workbook.title }}">{% else %}<div class="workbook-cover cover-mint"><span class="cover-label">РОБОЧИЙ ЗОШИТ</span><span class="cover-grade">{{ workbook.grade }}<small>КЛАС</small></span><span class="cover-subject">{{ workbook.subject }}</span><span class="cover-abstract">✳</span></div>{% endif %}</div>
+    <div class="exercise-section"><div class="exercise-heading"><div><p class="overline">ПОЯСНЕННЯ ДО ВПРАВ</p><h2>Розбери крок за кроком</h2></div><span class="result-count">{{ workbook.guides.count }} ПОЯСНЕНЬ</span></div>
+        {% if user.subscription.is_active or user.is_staff %}
+            {% if page_scans %}<div class="page-scan-grid">{% for scan in page_scans %}<figure class="page-scan"><img src="{% url 'page_scan_file' workbook.id scan.id %}" alt="Сторінка {{ scan.page_number }} зошита {{ workbook.title }}" loading="lazy"><figcaption>СТОРІНКА {{ scan.page_number }}</figcaption></figure>{% endfor %}</div>{% endif %}
+            {% for guide in workbook.guides.all %}<article class="exercise-entry"><div class="exercise-index"><span>СТОРІНКА {{ guide.page_number }}</span><b>№{{ guide.exercise_number }}</b></div><div class="exercise-copy">{% if guide.topic %}<h3>{{ guide.topic }}</h3>{% endif %}{% if guide.hint %}<p class="exercise-hint"><b>Підказка</b> {{ guide.hint }}</p>{% endif %}<div class="exercise-explanation">{{ guide.explanation|linebreaks }}</div>{% if guide.answer_check %}<details class="answer-check"><summary>Перевірити відповідь</summary><p>{{ guide.answer_check }}</p></details>{% endif %}</div></article>{% empty %}<div class="empty-exercises"><span>✳</span><p>Пояснення до цього зошита ще готуються.</p></div>{% endfor %}
+        {% else %}<div class="locked-panel"><span class="lock-icon">◷</span><div><h3>Пояснення доступні за підпискою</h3><p>Оформи місячний доступ, щоб відкривати розбір вправ.</p><a class="dark-button" href="{% url 'subscription' %}">Переглянути доступ ↗</a></div></div>{% endif %}
+    </div>
+</section>
+{% endblock %}
